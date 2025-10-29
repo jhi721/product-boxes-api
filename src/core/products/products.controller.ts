@@ -10,7 +10,12 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { CreateProductDto, GetManyProductsDto, UpdateProductDto } from './dto';
+import {
+  CreateProductDto,
+  DeleteProductDto,
+  GetManyProductsDto,
+  UpdateProductDto,
+} from './dto';
 import { ProductsService } from './products.service';
 
 @Controller('products')
@@ -32,7 +37,7 @@ export class ProductsController {
 
   @Patch(':id')
   async updateOne(
-    @Param('id') id: string,
+    @Param() { id }: UpdateProductDto.Params,
     @Body() body: UpdateProductDto.Body,
   ): UpdateProductDto.Response {
     const data = await this._productService.updateOne(id, body);
@@ -40,9 +45,9 @@ export class ProductsController {
     return { data };
   }
 
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
-  async delete(@Param('id') id: string) {
+  async delete(@Param() { id }: DeleteProductDto.Params) {
     await this._productService.deleteOne({ id });
   }
 }
