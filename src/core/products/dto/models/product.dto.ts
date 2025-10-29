@@ -1,7 +1,7 @@
 import { Product } from '../../entities';
 import { IsDate, IsString, IsUUID } from 'class-validator';
 
-export class ProductDto implements Product {
+export class ProductDto implements Omit<Product, 'box'> {
   @IsUUID()
   id: string;
 

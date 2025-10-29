@@ -3,6 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductsModule } from '../products/products.module';
 import { Product } from '../products/entities';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { Box } from '../boxes/entities';
+import { BoxesModule } from '../boxes/boxes.module';
 
 @Module({
   imports: [
@@ -12,7 +14,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
       port: 5432,
       username: 'hlib',
       database: 'gator',
-      entities: [Product],
+      entities: [Product, Box],
       synchronize: process.env.NODE_ENV !== 'production',
     }),
     ThrottlerModule.forRoot([
@@ -29,6 +31,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
     ]),
 
     ProductsModule,
+    BoxesModule,
   ],
 })
 export class AppModule {}

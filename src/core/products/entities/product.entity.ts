@@ -2,9 +2,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Box } from '../../boxes/entities';
 
 @Entity()
 export class Product {
@@ -21,6 +23,9 @@ export class Product {
     unique: true,
   })
   barcode: string;
+
+  @ManyToOne(() => Box, (box) => box.products, { nullable: true })
+  box: Box | null;
 
   @CreateDateColumn({
     name: 'created_at',
