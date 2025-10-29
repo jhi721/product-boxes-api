@@ -23,12 +23,11 @@ export class ProductsRepository {
   public async getMany(
     filter: FindOptionsWhere<Product>,
     options: {
-      limit: number;
-      offset: number;
-      order: Partial<Record<keyof Product, FindOptionsOrderValue>>;
-    },
+      limit?: number;
+      offset?: number;
+      order?: Partial<Record<keyof Product, FindOptionsOrderValue>>;
+    } = {},
   ) {
-    console.log(filter);
     const [data, total] = await this._productsRepository.findAndCount({
       where: filter,
       skip: options.offset,

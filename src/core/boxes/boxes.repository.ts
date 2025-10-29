@@ -90,20 +90,13 @@ export class BoxesRepository {
 
   public async addProducts({
     id,
-    productIds,
+    products,
   }: {
     id: string;
-    productIds: string[];
+    products: Product[];
   }) {
     const box = await this.getOne({ id });
     if (!box) {
-      return null;
-    }
-
-    const products = await this._productsRepository.findBy({
-      id: In(productIds),
-    });
-    if (productIds.length !== products.length) {
       return null;
     }
 
@@ -123,28 +116,11 @@ export class BoxesRepository {
   }
 
   public async removeProducts({
-    id,
-    productIds,
+    products,
   }: {
     id: string;
-    productIds: string[];
+    products: Product[];
   }) {
-    const box = await this.getOne({ id });
-    if (!box) {
-      return null;
-    }
-
-    if (box.status !== BoxStatus.Created) {
-      return null;
-    }
-
-    const products = await this._productsRepository.findBy({
-      id: In(productIds),
-    });
-    if (productIds.length !== products.length) {
-      return null;
-    }
-
     const productsToUpdate = products.map((product) => {
       product.box = null;
 
@@ -152,7 +128,5 @@ export class BoxesRepository {
     });
 
     await this._productsRepository.save(productsToUpdate);
-
-    return { ...box, products: productsToUpdate };
   }
 }
