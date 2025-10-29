@@ -1,7 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Box, BoxStatus } from './entities';
-import { DeepPartial, FindOptionsWhere, In, Repository } from 'typeorm';
+import {
+  DataSource,
+  DeepPartial,
+  FindOptionsWhere,
+  In,
+  Repository,
+} from 'typeorm';
 import { FindOptionsOrderValue } from 'typeorm/find-options/FindOptionsOrder';
 import { IBoxesRepository } from './types';
 import { Product } from '../products/entities';
@@ -13,14 +19,31 @@ export class BoxesRepository {
     private readonly _boxesRepository: Repository<Box>,
     @InjectRepository(Product)
     private readonly _productsRepository: Repository<Product>,
+    private readonly _dataSource: DataSource,
   ) {}
 
   public async create(
     data: IBoxesRepository.Create.Params,
   ): IBoxesRepository.Create.ReturnType {
-    const product = this._boxesRepository.create(data);
+    return this._dataSource.transaction(async (entityManager) => {
+      const box = entityManager.create(Box, {
+        label: data.label,
+      });
 
-    return this._boxesRepository.save(product);
+      await entityManager.save(box);
+
+      const products = data.products.map((product) =>
+        entityManager.create(Product, {
+          name: product.name,
+          barcode: product.barcode,
+          box,
+        }),
+      );
+
+      await entityManager.save(products);
+
+      return { ...box, products };
+    });
   }
 
   public async getMany(
@@ -92,7 +115,7 @@ export class BoxesRepository {
 
     await this._productsRepository.save(productsToUpdate);
 
-    return products;
+    return this.getOne({ id });
   }
 
   public async deleteOne({ id }: { id: string }) {
@@ -130,6 +153,6 @@ export class BoxesRepository {
 
     await this._productsRepository.save(productsToUpdate);
 
-    return products;
+    return { ...box, products: productsToUpdate };
   }
 }
