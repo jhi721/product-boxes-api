@@ -5,30 +5,19 @@ import { Product } from '../products/entities';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { Box } from '../boxes/entities';
 import { BoxesModule } from '../boxes/boxes.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'hlib',
-      database: 'gator',
-      entities: [Product, Box],
+      url: process.env.DB_URL,
+      ssl: process.env.DB_SSL === 'true',
       synchronize: process.env.NODE_ENV !== 'production',
+      entities: [Product, Box],
     }),
-    ThrottlerModule.forRoot([
-      {
-        name: 'read',
-        ttl: 60_000,
-        limit: 100,
-      },
-      {
-        name: 'write',
-        ttl: 60_000,
-        limit: 30,
-      },
-    ]),
+    ThrottlerModule.forRoot(),
 
     ProductsModule,
     BoxesModule,
