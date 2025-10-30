@@ -4,8 +4,10 @@ import { Box, BoxStatus } from './entities';
 import {
   DataSource,
   DeepPartial,
+  EntityManager,
   FindOptionsWhere,
   In,
+  IsNull,
   Repository,
 } from 'typeorm';
 import { FindOptionsOrderValue } from 'typeorm/find-options/FindOptionsOrder';
@@ -90,25 +92,47 @@ export class BoxesRepository {
 
   public async addProducts({
     id,
-    products,
+    productIds,
   }: {
     id: string;
-    products: Product[];
+    productIds: string[];
   }) {
-    const box = await this.getOne({ id });
-    if (!box) {
-      return null;
-    }
+    return this._dataSource.transaction(async (entityManager) => {
+      const box = await entityManager.findOne(Box, {
+        where: {
+          id,
+          status: BoxStatus.Created,
+        },
+        lock: {
+          mode: 'pessimistic_write',
+        },
+      });
 
-    const productsToUpdate = products.map((product) => {
-      product.box = box;
+      if (!box) {
+        return null;
+      }
 
-      return product;
+      const products = await entityManager.find(Product, {
+        where: {
+          id: In(productIds),
+          box: IsNull(),
+        },
+        lock: {
+          mode: 'pessimistic_write',
+        },
+      });
+
+      if (productIds.length !== products.length) {
+        throw new Error('Some products do not exist');
+      }
+
+      await this._assignProductsToBox({ entityManager, box, products });
+
+      return entityManager.findOne(Box, {
+        where: { id },
+        relations: ['products'],
+      });
     });
-
-    await this._productsRepository.save(productsToUpdate);
-
-    return this.getOne({ id });
   }
 
   public async deleteOne({ id }: { id: string }) {
@@ -116,17 +140,61 @@ export class BoxesRepository {
   }
 
   public async removeProducts({
-    products,
+    id,
+    productIds,
   }: {
     id: string;
+    productIds: string[];
+  }) {
+    return this._dataSource.transaction(async (entityManager) => {
+      const box = await entityManager.findOne(Box, {
+        where: {
+          id,
+          status: BoxStatus.Created,
+        },
+        lock: {
+          mode: 'pessimistic_write',
+        },
+      });
+
+      if (!box) {
+        return null;
+      }
+
+      const products = await entityManager.find(Product, {
+        where: {
+          id: In(productIds),
+          box: { id },
+        },
+        lock: {
+          mode: 'pessimistic_write',
+        },
+      });
+
+      await this._assignProductsToBox({ entityManager, box: null, products });
+
+      return entityManager.findOne(Box, {
+        where: { id },
+        relations: ['products'],
+      });
+    });
+  }
+
+  private async _assignProductsToBox({
+    entityManager,
+    box,
+    products,
+  }: {
+    entityManager: EntityManager;
+    box: Box | null;
     products: Product[];
   }) {
-    const productsToUpdate = products.map((product) => {
-      product.box = null;
+    const updatedProducts = products.map((product) => {
+      product.box = box;
 
       return product;
     });
 
-    await this._productsRepository.save(productsToUpdate);
+    await entityManager.save(updatedProducts);
   }
 }

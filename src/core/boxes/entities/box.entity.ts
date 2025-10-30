@@ -16,7 +16,7 @@ export enum BoxStatus {
 }
 
 @Entity()
-@Check(`"label" ~ '[A-Z0-9-_]{3,32}$'`)
+@Check(`"label" ~ '^[A-Z0-9_-]{3,32}$'`)
 export class Box {
   @PrimaryGeneratedColumn('uuid')
   id: string;

@@ -61,9 +61,9 @@ export class BoxesController {
   @Delete(':id/products')
   removeProductsFromBox(
     @Param() params: RemoveProductsDto.Params,
-    @Query() query: RemoveProductsDto.Query,
+    @Body() body: RemoveProductsDto.Body,
   ): RemoveProductsDto.Response {
-    return this._boxesService.removeProductsFromBox({ ...params, ...query });
+    return this._boxesService.removeProductsFromBox({ ...params, ...body });
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)

@@ -1,11 +1,4 @@
-import {
-  IsString,
-  IsUUID,
-  Matches,
-  MaxLength,
-  MinLength,
-  ValidateNested,
-} from 'class-validator';
+import { IsString, Length, Matches, ValidateNested } from 'class-validator';
 import { BoxDto } from './models';
 import { CreateProductDto } from '../../products/dto';
 import { Type } from 'class-transformer';
@@ -13,9 +6,8 @@ import { Type } from 'class-transformer';
 export namespace CreateBoxDto {
   export class Body implements Pick<BoxDto, 'label'> {
     @IsString()
-    @Matches('/^[A-Z0-9-_]{3,32}$/')
-    @MaxLength(32)
-    @MinLength(3)
+    @Matches(/^[A-Z0-9-_]{3,32}$/)
+    @Length(3, 32)
     label: string;
 
     @ValidateNested({ each: true })

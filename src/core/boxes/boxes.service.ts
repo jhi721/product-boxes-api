@@ -15,7 +15,6 @@ import {
 } from './dto';
 import { Box, BoxStatus } from './entities';
 import { ProductsRepository } from '../products/products.repository';
-import { In } from 'typeorm';
 
 @Injectable()
 export class BoxesService {
@@ -107,64 +106,45 @@ export class BoxesService {
     productIds,
   }: AddProductDto.Params & AddProductDto.Body) {
     const box = await this._boxesRepository.getOne({ id });
+
     if (!box) {
-      throw new NotFoundException();
+      throw new NotFoundException('Cannot find box');
     }
 
     if (box.status !== BoxStatus.Created) {
-      throw new BadRequestException();
+      throw new BadRequestException(
+        `You can only add products to the box with ${BoxStatus.Created} status`,
+      );
     }
 
-    const products = await this._productsRepository.getMany({
-      id: In(productIds),
-    });
-
-    if (products.total < productIds.length) {
-      throw new NotFoundException('Some of the products do not exist');
-    }
-
-    const data = await this._boxesRepository.addProducts({
+    const updatedBox = await this._boxesRepository.addProducts({
       id,
-      products: products.data,
+      productIds,
     });
+
+    if (!updatedBox) {
+      throw new BadRequestException('Cannot add products to the box');
+    }
 
     return {
-      data,
+      data: updatedBox,
     };
   }
 
   public async removeProductsFromBox({
     id,
     productIds,
-  }: RemoveProductsDto.Params & RemoveProductsDto.Query) {
-    const box = await this._boxesRepository.getOne({ id });
-    if (!box) {
+  }: RemoveProductsDto.Params & RemoveProductsDto.Body) {
+    const updatedBox = await this._boxesRepository.removeProducts({
+      id,
+      productIds,
+    });
+
+    if (!updatedBox) {
       throw new NotFoundException();
     }
 
-    if (box.status !== BoxStatus.Created) {
-      throw new BadRequestException();
-    }
-
-    const products = await this._productsRepository.getMany({
-      id: In(productIds),
-      box: {
-        id,
-      },
-    });
-
-    if (products.total < productIds.length) {
-      throw new NotFoundException('Some of the products do not exist');
-    }
-
-    await this._boxesRepository.removeProducts({
-      id,
-      products: products.data,
-    });
-
-    const data = await this._boxesRepository.getOne({ id });
-
-    return { data };
+    return { data: updatedBox };
   }
 
   public async deleteOne(params: DeleteBoxDto.Params) {
