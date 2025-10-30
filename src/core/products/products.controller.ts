@@ -31,7 +31,6 @@ export class ProductsController {
   getMany(
     @Query() query: GetManyProductsDto.Query,
   ): GetManyProductsDto.Response {
-    console.log(query);
     return this._productService.getMany(query);
   }
 

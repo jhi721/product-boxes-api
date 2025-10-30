@@ -6,6 +6,7 @@ import {
   IsString,
   IsUUID,
   Max,
+  Min,
   ValidateIf,
   ValidateNested,
 } from 'class-validator';
@@ -35,13 +36,13 @@ export namespace GetManyBoxesDto {
     @Type(() => Number)
     @IsOptional()
     @Max(100)
-    @IsPositive()
+    @Min(1)
     limit: number = 10;
 
     @IsInt()
     @Type(() => Number)
     @IsOptional()
-    @IsPositive()
+    @Min(0)
     offset: number = 0;
 
     @Expose({ name: 'sort_by' })

@@ -4,7 +4,7 @@ import { Product } from './entities';
 import { DeepPartial, FindOptionsWhere, IsNull, Repository } from 'typeorm';
 import { IProductRepository } from './types';
 import { FindOptionsOrderValue } from 'typeorm/find-options/FindOptionsOrder';
-import { BoxStatus } from '../boxes/entities';
+import { Box, BoxStatus } from '../boxes/entities';
 
 @Injectable()
 export class ProductsRepository {
@@ -49,23 +49,62 @@ export class ProductsRepository {
     id: string;
     data: DeepPartial<Product>;
   }) {
-    const product = await this._productsRepository.findOne({
-      where: [
-        { id, box: { status: BoxStatus.Created } },
-        { id, box: IsNull() },
-      ],
-    });
+    return this._productsRepository.manager.transaction(
+      async (entityManager) => {
+        const product = await entityManager.findOne(Product, {
+          where: { id },
+          lock: { mode: 'pessimistic_write' },
+        });
 
-    if (!product) {
-      return null;
-    }
+        if (!product) {
+          return null;
+        }
 
-    Object.assign(product, data);
+        if (product.box) {
+          await entityManager.findOne(Box, {
+            where: { id: product.box.id },
+            lock: { mode: 'pessimistic_write' },
+          });
+        }
 
-    return this._productsRepository.save(product);
+        if (product.box && product.box.status !== BoxStatus.Created) {
+          return null;
+        }
+
+        Object.assign(product, data);
+
+        return entityManager.save(product);
+      },
+    );
   }
 
-  public async deleteOne({ id }: { id: string }) {
-    await this._productsRepository.delete(id);
+  async deleteOne({ id }: { id: string }) {
+    await this._productsRepository.manager.transaction(
+      async (entityManager) => {
+        const product = await entityManager.findOne(Product, {
+          where: { id },
+          relations: ['box'],
+        });
+
+        if (!product) {
+          return;
+        }
+
+        if (product.box) {
+          const box = await entityManager.findOne(Box, {
+            where: { id: product.box.id },
+            lock: { mode: 'pessimistic_write' },
+          });
+
+          console.log(product.box);
+
+          if (!box || box.status !== BoxStatus.Created) {
+            return;
+          }
+        }
+
+        await entityManager.delete(Product, id);
+      },
+    );
   }
 }

@@ -24,7 +24,10 @@ export class Product {
   })
   barcode: string;
 
-  @ManyToOne(() => Box, (box) => box.products, { nullable: true })
+  @ManyToOne(() => Box, (box) => box.products, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
   box: Box | null;
 
   @CreateDateColumn({
