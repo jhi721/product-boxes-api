@@ -14,14 +14,10 @@ import {
   UpdateBoxDto,
 } from './dto';
 import { Box, BoxStatus } from './entities';
-import { ProductsRepository } from '../products/products.repository';
 
 @Injectable()
 export class BoxesService {
-  constructor(
-    private readonly _boxesRepository: BoxesRepository,
-    private readonly _productsRepository: ProductsRepository,
-  ) {}
+  constructor(private readonly _boxesRepository: BoxesRepository) {}
 
   public async create(data: CreateBoxDto.Body) {
     const product = await this._boxesRepository.create(data);

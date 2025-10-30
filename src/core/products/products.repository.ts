@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities';
-import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
+import { DeepPartial, FindOptionsWhere, IsNull, Repository } from 'typeorm';
 import { IProductRepository } from './types';
 import { FindOptionsOrderValue } from 'typeorm/find-options/FindOptionsOrder';
+import { BoxStatus } from '../boxes/entities';
 
 @Injectable()
 export class ProductsRepository {
@@ -48,8 +49,11 @@ export class ProductsRepository {
     id: string;
     data: DeepPartial<Product>;
   }) {
-    const product = await this._productsRepository.findOneBy({
-      id,
+    const product = await this._productsRepository.findOne({
+      where: [
+        { id, box: { status: BoxStatus.Created } },
+        { id, box: IsNull() },
+      ],
     });
 
     if (!product) {
