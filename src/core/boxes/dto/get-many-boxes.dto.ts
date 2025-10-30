@@ -2,6 +2,7 @@ import {
   IsIn,
   IsInt,
   IsOptional,
+  IsPositive,
   IsString,
   IsUUID,
   Max,
@@ -10,7 +11,7 @@ import {
 } from 'class-validator';
 import { Expose, Transform, Type } from 'class-transformer';
 import { BoxDto } from './models';
-import { IsKeyOfClass } from '../../../utils/validation';
+import { IsKeyOfClass, transformQueryJson } from '../../../utils/validation';
 
 export namespace GetManyBoxesDto {
   class Search implements Partial<BoxDto> {
@@ -27,26 +28,20 @@ export namespace GetManyBoxesDto {
     @IsOptional()
     @ValidateNested()
     @Type(() => Search)
-    @Transform(({ value }) => {
-      if (typeof value === 'string') {
-        try {
-          return JSON.parse(value) as Search;
-        } catch {
-          return undefined;
-        }
-      }
-    })
+    @Transform(transformQueryJson<Search>)
     search: Search = {};
 
     @IsInt()
     @Type(() => Number)
     @IsOptional()
     @Max(100)
+    @IsPositive()
     limit: number = 10;
 
     @IsInt()
     @Type(() => Number)
     @IsOptional()
+    @IsPositive()
     offset: number = 0;
 
     @Expose({ name: 'sort_by' })

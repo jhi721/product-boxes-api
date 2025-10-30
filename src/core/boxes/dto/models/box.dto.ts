@@ -5,6 +5,8 @@ import {
   IsString,
   IsUUID,
   ValidateNested,
+  Matches,
+  Length,
 } from 'class-validator';
 import { Product } from '../../../products/entities';
 import { Type } from 'class-transformer';
@@ -15,6 +17,8 @@ export class BoxDto implements Box {
   id: string;
 
   @IsString()
+  @Matches(/^[A-Z0-9-_]{3,32}$/)
+  @Length(3, 32)
   label: string;
 
   @IsEnum(BoxStatus)

@@ -1,16 +1,14 @@
-import { IsString, MaxLength, MinLength } from 'class-validator';
+import { IsString, Length } from 'class-validator';
 import { ProductDto } from './models';
 
 export namespace CreateProductDto {
   export class Body {
     @IsString()
-    @MaxLength(100)
-    @MinLength(2)
+    @Length(2, 100)
     name: string;
 
     @IsString()
-    @MaxLength(32)
-    @MinLength(8)
+    @Length(8, 32)
     barcode: string;
   }
 

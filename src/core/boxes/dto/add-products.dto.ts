@@ -1,4 +1,4 @@
-import { IsUUID } from 'class-validator';
+import { IsArray, IsUUID } from 'class-validator';
 import { BoxDto } from './models';
 
 export namespace AddProductDto {
@@ -8,6 +8,7 @@ export namespace AddProductDto {
   }
 
   export class Body {
+    @IsArray()
     @IsUUID('all', { each: true })
     productIds: string[];
   }

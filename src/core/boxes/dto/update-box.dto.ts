@@ -1,11 +1,4 @@
-import {
-  IsEnum,
-  IsOptional,
-  IsString,
-  IsUUID,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
+import { IsEnum, IsOptional, IsString, IsUUID, Length } from 'class-validator';
 import { BoxDto } from './models';
 import { BoxStatus } from '../entities';
 
@@ -17,8 +10,7 @@ export namespace UpdateBoxDto {
 
   export class Body {
     @IsString()
-    @MaxLength(32)
-    @MinLength(3)
+    @Length(3, 32)
     @IsOptional()
     label?: string;
 

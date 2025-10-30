@@ -1,4 +1,10 @@
-import { IsString, Length, Matches, ValidateNested } from 'class-validator';
+import {
+  IsArray,
+  IsString,
+  Length,
+  Matches,
+  ValidateNested,
+} from 'class-validator';
 import { BoxDto } from './models';
 import { CreateProductDto } from '../../products/dto';
 import { Type } from 'class-transformer';
@@ -10,6 +16,7 @@ export namespace CreateBoxDto {
     @Length(3, 32)
     label: string;
 
+    @IsArray()
     @ValidateNested({ each: true })
     @Type(() => CreateProductDto.Body)
     products: CreateProductDto.Body[];
