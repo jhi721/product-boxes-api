@@ -1,16 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Box, BoxStatus } from './entities';
-import {
-  DataSource,
-  DeepPartial,
-  EntityManager,
-  FindOptionsWhere,
-  In,
-  IsNull,
-  Repository,
-} from 'typeorm';
-import { FindOptionsOrderValue } from 'typeorm/find-options/FindOptionsOrder';
+import { DataSource, In, IsNull, Repository } from 'typeorm';
 import { IBoxesRepository } from './types';
 import { Product } from '../products/entities';
 
@@ -19,8 +10,6 @@ export class BoxesRepository {
   constructor(
     @InjectRepository(Box)
     private readonly _boxesRepository: Repository<Box>,
-    @InjectRepository(Product)
-    private readonly _productsRepository: Repository<Product>,
     private readonly _dataSource: DataSource,
   ) {}
 
@@ -48,14 +37,10 @@ export class BoxesRepository {
     });
   }
 
-  public async getMany(
-    filter: FindOptionsWhere<Box>,
-    options: {
-      limit: number;
-      offset: number;
-      order: Partial<Record<keyof Box, FindOptionsOrderValue>>;
-    },
-  ) {
+  public async getMany({
+    filter,
+    options,
+  }: IBoxesRepository.GetMany.Params): IBoxesRepository.GetMany.ReturnType {
     const [data, total] = await this._boxesRepository.findAndCount({
       where: filter,
       skip: options.offset,
@@ -69,14 +54,19 @@ export class BoxesRepository {
     };
   }
 
-  public async getOne({ id }: { id: string }) {
+  public async getOne({
+    id,
+  }: IBoxesRepository.GetOne.Params): IBoxesRepository.GetOne.ReturnType {
     return this._boxesRepository.findOne({
       where: { id },
       relations: ['products'],
     });
   }
 
-  public async updateOne({ id, data }: { id: string; data: DeepPartial<Box> }) {
+  public async updateOne({
+    id,
+    data,
+  }: IBoxesRepository.UpdateOne.Params): IBoxesRepository.UpdateOne.ReturnType {
     const product = await this._boxesRepository.findOneBy({
       id,
     });
@@ -93,10 +83,7 @@ export class BoxesRepository {
   public async addProducts({
     id,
     productIds,
-  }: {
-    id: string;
-    productIds: string[];
-  }) {
+  }: IBoxesRepository.AddProducts.Params): IBoxesRepository.AddProducts.ReturnType {
     return this._dataSource.transaction(async (entityManager) => {
       const box = await entityManager.findOne(Box, {
         where: {
@@ -135,7 +122,7 @@ export class BoxesRepository {
     });
   }
 
-  public async deleteOne({ id }: { id: string }) {
+  public async deleteOne({ id }: IBoxesRepository.DeleteOne.Params) {
     await this._dataSource.transaction(async (entityManager) => {
       const box = await entityManager.findOne(Box, {
         where: {
@@ -158,10 +145,7 @@ export class BoxesRepository {
   public async removeProducts({
     id,
     productIds,
-  }: {
-    id: string;
-    productIds: string[];
-  }) {
+  }: IBoxesRepository.RemoveProducts.Params): IBoxesRepository.RemoveProducts.ReturnType {
     return this._dataSource.transaction(async (entityManager) => {
       const box = await entityManager.findOne(Box, {
         where: {
@@ -200,11 +184,7 @@ export class BoxesRepository {
     entityManager,
     box,
     products,
-  }: {
-    entityManager: EntityManager;
-    box: Box | null;
-    products: Product[];
-  }) {
+  }: IBoxesRepository._AssignProductsToBox.Params) {
     const updatedProducts = products.map((product) => {
       product.box = box;
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities';
-import { DeepPartial, FindOptionsWhere, IsNull, Repository } from 'typeorm';
+import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
 import { IProductRepository } from './types';
 import { FindOptionsOrderValue } from 'typeorm/find-options/FindOptionsOrder';
 import { Box, BoxStatus } from '../boxes/entities';

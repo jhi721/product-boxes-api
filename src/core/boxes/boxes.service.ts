@@ -44,10 +44,13 @@ export class BoxesService {
       order[sortBy] = direction;
     }
 
-    const { data, total } = await this._boxesRepository.getMany(search || {}, {
-      limit,
-      offset,
-      order,
+    const { data, total } = await this._boxesRepository.getMany({
+      filter: search || {},
+      options: {
+        limit,
+        offset,
+        order,
+      },
     });
 
     return {
