@@ -7,7 +7,9 @@ import { Box } from '../boxes/entities';
 import { BoxesModule } from '../boxes/boxes.module';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
+import KeyvRedis from '@keyv/redis';
 
 @Module({
   imports: [
@@ -26,6 +28,15 @@ import { APP_GUARD } from '@nestjs/core';
       ],
       storage: new ThrottlerStorageRedisService(process.env.REDIS_URL),
     }),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      useFactory: () => {
+        return {
+          stores: [new KeyvRedis(process.env.REDIS_URL)],
+        };
+      },
+    }),
+
     ProductsModule,
     BoxesModule,
   ],
@@ -33,6 +44,10 @@ import { APP_GUARD } from '@nestjs/core';
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CacheInterceptor,
     },
   ],
 })

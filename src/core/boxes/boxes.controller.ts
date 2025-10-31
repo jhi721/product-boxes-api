@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   AddProductDto,
@@ -21,7 +22,9 @@ import {
 } from './dto';
 import { BoxesService } from './boxes.service';
 import { Throttle } from '@nestjs/throttler';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
+@UseInterceptors(CacheInterceptor)
 @Controller('boxes')
 export class BoxesController {
   constructor(private readonly _boxesService: BoxesService) {}
