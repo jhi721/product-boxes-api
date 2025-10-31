@@ -136,7 +136,23 @@ export class BoxesRepository {
   }
 
   public async deleteOne({ id }: { id: string }) {
-    await this._boxesRepository.delete(id);
+    await this._dataSource.transaction(async (entityManager) => {
+      const box = await entityManager.findOne(Box, {
+        where: {
+          id,
+          status: BoxStatus.Created,
+        },
+        lock: {
+          mode: 'pessimistic_write',
+        },
+      });
+
+      if (!box) {
+        return;
+      }
+
+      await entityManager.delete(Box, id);
+    });
   }
 
   public async removeProducts({
