@@ -1,8 +1,8 @@
 import { IsUUID } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
-export namespace DeleteProductDto {
-  export class Params {
-    @IsUUID()
-    id: string;
-  }
+export class DeleteProductParamsDto {
+  @ApiProperty({ format: 'uuid' })
+  @IsUUID()
+  id: string;
 }

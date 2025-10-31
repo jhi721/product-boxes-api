@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ProductsModule } from '../products/products.module';
-import { Product } from '../products/entities';
+import { ProductsModule } from '@core/products/products.module';
+import { Product } from '@core/products/entities';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { Box } from '../boxes/entities';
-import { BoxesModule } from '../boxes/boxes.module';
+import { Box } from '@core/boxes/entities';
+import { BoxesModule } from '@core/boxes/boxes.module';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';

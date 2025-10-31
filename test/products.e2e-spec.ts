@@ -1,15 +1,19 @@
 import { ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
-import { AppModule } from '../src/core/app/app.module';
+import { AppModule } from '@core/app/app.module';
 import { DataSource, Repository } from 'typeorm';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { Product } from '../src/core/products/entities';
+import { Product } from '@core/products/entities';
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'test';
 
 if (!process.env.DB_URL) {
   throw new Error('Please provide a DB_URL env var');
+}
+
+if (!process.env.REDIS_URL) {
+  throw new Error('Please provide a REDIS_URL env var');
 }
 
 describe('Products API', () => {

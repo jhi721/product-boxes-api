@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
-import { Product } from '../core/products/entities';
-import { Box } from '../core/boxes/entities';
+import { Product } from '@core/products/entities';
+import { Box } from '@core/boxes/entities';
 
 const url = process.env.DB_URL;
 

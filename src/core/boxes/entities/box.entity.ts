@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Product } from '../../products/entities';
+import { Product } from '@core/products/entities';
 
 export enum BoxStatus {
   Created = 'CREATED',

@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Box, BoxStatus } from './entities';
 import { DataSource, In, IsNull, Repository } from 'typeorm';
 import { IBoxesRepository } from './types';
-import { Product } from '../products/entities';
+import { Product } from '@core/products/entities';
 
 @Injectable()
 export class BoxesRepository {

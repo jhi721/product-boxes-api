@@ -1,6 +1,6 @@
-import { Product } from '../entities';
+import { Product } from '@core/products/entities';
 import { DeepPartial, FindOptionsWhere } from 'typeorm';
-import { Box } from '../../boxes/entities';
+import { Box } from '@core/boxes/entities';
 import { FindOptionsOrderValue } from 'typeorm/find-options/FindOptionsOrder';
 
 export namespace IProductRepository {

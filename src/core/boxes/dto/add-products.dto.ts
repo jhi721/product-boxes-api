@@ -1,19 +1,20 @@
 import { IsArray, IsUUID } from 'class-validator';
 import { BoxDto } from './models';
+import { ApiProperty } from '@nestjs/swagger';
 
-export namespace AddProductDto {
-  export class Params {
-    @IsUUID()
-    id: string;
-  }
-
-  export class Body {
-    @IsArray()
-    @IsUUID('all', { each: true })
-    productIds: string[];
-  }
-
-  export type Response = Promise<{
-    data: BoxDto | null;
-  }>;
+export class AddProductsParamsDto {
+  @ApiProperty({ format: 'uuid' })
+  @IsUUID()
+  id: string;
 }
+
+export class AddProductsBodyDto {
+  @ApiProperty({ type: 'string', isArray: true, example: ['uuid-1', 'uuid-2'] })
+  @IsArray()
+  @IsUUID('all', { each: true })
+  productIds: string[];
+}
+
+export type AddProductsResponse = Promise<{
+  data: BoxDto | null;
+}>;

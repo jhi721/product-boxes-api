@@ -1,13 +1,13 @@
-import { Box } from '../entities';
-import { CreateProductDto } from '../../products/dto';
+import { Box } from '@core/boxes/entities';
+import { CreateProductBodyDto } from '@core/products/dto';
 import { DeepPartial, EntityManager, FindOptionsWhere } from 'typeorm';
-import { Product } from '../../products/entities';
+import { Product } from '@core/products/entities';
 import { FindOptionsOrderValue } from 'typeorm/find-options/FindOptionsOrder';
 
 export namespace IBoxesRepository {
   export namespace Create {
     export type Params = Pick<Box, 'label'> & {
-      products: CreateProductDto.Body[];
+      products: CreateProductBodyDto[];
     };
 
     export type ReturnType = Promise<Box>;

@@ -1,16 +1,20 @@
 import { ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
-import { AppModule } from '../src/core/app/app.module';
+import { AppModule } from '@core/app/app.module';
 import { DataSource, Repository } from 'typeorm';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { Box, BoxStatus } from '../src/core/boxes/entities';
-import { Product } from '../src/core/products/entities';
+import { Box, BoxStatus } from '@core/boxes/entities';
+import { Product } from '@core/products/entities';
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'test';
 
 if (!process.env.DB_URL) {
   throw new Error('Please provide a DB_URL env var');
+}
+
+if (!process.env.REDIS_URL) {
+  throw new Error('Please provide a REDIS_URL env var');
 }
 
 describe('Boxes API', () => {
@@ -34,7 +38,6 @@ describe('Boxes API', () => {
     await app.init();
 
     dataSource = app.get(DataSource);
-    // Ensure a clean schema so labels/products from previous runs don't collide
     await dataSource.synchronize(true);
     boxRepository = dataSource.getRepository(Box);
     productRepository = dataSource.getRepository(Product);
@@ -142,7 +145,6 @@ describe('Boxes API', () => {
   });
 
   it('POST /boxes/:id/products should fail when box is not CREATED', async () => {
-    // Create a product to try to add
     const prod = await request(app.getHttpServer())
       .post('/products')
       .send({ name: 'Unassigned', barcode: 'UNASSIGNED00001' })

@@ -11,60 +11,69 @@ import {
 } from 'class-validator';
 import { Expose, Transform, Type } from 'class-transformer';
 import { BoxDto } from './models';
-import { IsKeyOfClass, transformQueryJson } from '../../../utils/validation';
+import { IsKeyOfClass, transformQueryJson } from '@utils/validation';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
-export namespace GetManyBoxesDto {
-  class Search implements Partial<BoxDto> {
-    @IsUUID()
-    @IsOptional()
-    id?: string;
+export class GetManyBoxesSearchDto implements Partial<BoxDto> {
+  @ApiPropertyOptional({ format: 'uuid' })
+  @IsUUID()
+  @IsOptional()
+  id?: string;
 
-    @IsString()
-    @IsOptional()
-    label?: string;
-  }
-
-  export class Query {
-    @IsOptional()
-    @ValidateNested()
-    @Type(() => Search)
-    @Transform(transformQueryJson<Search>)
-    search: Search = {};
-
-    @IsInt()
-    @Type(() => Number)
-    @IsOptional()
-    @Max(100)
-    @Min(1)
-    limit: number = 10;
-
-    @IsInt()
-    @Type(() => Number)
-    @IsOptional()
-    @Min(0)
-    offset: number = 0;
-
-    @Expose({ name: 'sort_by' })
-    @IsString()
-    @IsKeyOfClass(BoxDto)
-    @IsOptional()
-    sortBy?: keyof BoxDto;
-
-    @IsString()
-    @IsOptional()
-    @IsIn(['asc', 'desc'])
-    @ValidateIf((obj: Query) => !!obj.sortBy)
-    direction: 'asc' | 'desc' = 'desc';
-  }
-
-  type Pagination = {
-    limit: number;
-    offset: number;
-    total: number;
-  };
-
-  export type Response = Promise<{
-    data: BoxDto[];
-    pagination: Pagination;
-  }>;
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  label?: string;
 }
+
+export class GetManyBoxesQueryDto {
+  @ApiPropertyOptional({ description: 'JSON stringified search object' })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => GetManyBoxesSearchDto)
+  @Transform(transformQueryJson<GetManyBoxesSearchDto>)
+  search: GetManyBoxesSearchDto = {} as GetManyBoxesSearchDto;
+
+  @ApiPropertyOptional({ default: 10, maximum: 100, minimum: 1 })
+  @IsInt()
+  @Type(() => Number)
+  @IsOptional()
+  @Max(100)
+  @Min(1)
+  limit: number = 10;
+
+  @ApiPropertyOptional({ default: 0, minimum: 0 })
+  @IsInt()
+  @Type(() => Number)
+  @IsOptional()
+  @Min(0)
+  offset: number = 0;
+
+  @Expose({ name: 'sort_by' })
+  @ApiPropertyOptional({
+    description: 'Sort by field',
+    enum: Object.keys(new BoxDto()),
+  })
+  @IsString()
+  @IsKeyOfClass(BoxDto)
+  @IsOptional()
+  sortBy?: keyof BoxDto;
+
+  @ApiPropertyOptional({ enum: ['asc', 'desc'], default: 'desc' })
+  @IsString()
+  @IsOptional()
+  @IsIn(['asc', 'desc'])
+  @ValidateIf((obj: GetManyBoxesQueryDto) => !!obj.sortBy)
+  direction: 'asc' | 'desc' = 'desc';
+}
+
+type Pagination = {
+  limit: number;
+  offset: number;
+  total: number;
+};
+
+export type GetManyBoxesResponse = Promise<{
+  data: BoxDto[];
+  pagination: Pagination;
+}>;

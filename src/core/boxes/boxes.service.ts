@@ -5,13 +5,15 @@ import {
 } from '@nestjs/common';
 import { BoxesRepository } from './boxes.repository';
 import {
-  AddProductDto,
-  CreateBoxDto,
-  DeleteBoxDto,
-  GetManyBoxesDto,
-  GetOneBoxDto,
-  RemoveProductsDto,
-  UpdateBoxDto,
+  AddProductsBodyDto,
+  AddProductsParamsDto,
+  CreateBoxBodyDto,
+  DeleteBoxParamsDto,
+  GetManyBoxesQueryDto,
+  GetOneBoxParamsDto,
+  RemoveProductsBodyDto,
+  RemoveProductsParamsDto,
+  UpdateBoxBodyDto,
 } from './dto';
 import { Box, BoxStatus } from './entities';
 
@@ -19,13 +21,13 @@ import { Box, BoxStatus } from './entities';
 export class BoxesService {
   constructor(private readonly _boxesRepository: BoxesRepository) {}
 
-  public async create(data: CreateBoxDto.Body) {
+  public async create(data: CreateBoxBodyDto) {
     const product = await this._boxesRepository.create(data);
 
     return { data: product };
   }
 
-  public async getOne(params: GetOneBoxDto.Params) {
+  public async getOne(params: GetOneBoxParamsDto) {
     const data = await this._boxesRepository.getOne(params);
 
     return { data };
@@ -37,7 +39,7 @@ export class BoxesService {
     sortBy,
     offset,
     direction,
-  }: GetManyBoxesDto.Query) {
+  }: GetManyBoxesQueryDto) {
     const order: Record<string, typeof direction> = {};
 
     if (sortBy) {
@@ -63,7 +65,7 @@ export class BoxesService {
     };
   }
 
-  public async updateOne(id: string, data: UpdateBoxDto.Body) {
+  public async updateOne(id: string, data: UpdateBoxBodyDto) {
     const box = await this._boxesRepository.getOne({ id });
 
     if (!box) {
@@ -103,7 +105,7 @@ export class BoxesService {
   public async addProductsToBox({
     id,
     productIds,
-  }: AddProductDto.Params & AddProductDto.Body) {
+  }: AddProductsParamsDto & AddProductsBodyDto) {
     const box = await this._boxesRepository.getOne({ id });
 
     if (!box) {
@@ -133,7 +135,7 @@ export class BoxesService {
   public async removeProductsFromBox({
     id,
     productIds,
-  }: RemoveProductsDto.Params & RemoveProductsDto.Body) {
+  }: RemoveProductsParamsDto & RemoveProductsBodyDto) {
     const updatedBox = await this._boxesRepository.removeProducts({
       id,
       productIds,
@@ -146,7 +148,7 @@ export class BoxesService {
     return { data: updatedBox };
   }
 
-  public async deleteOne(params: DeleteBoxDto.Params) {
+  public async deleteOne(params: DeleteBoxParamsDto) {
     const box = await this._boxesRepository.getOne(params);
 
     if (!box) {

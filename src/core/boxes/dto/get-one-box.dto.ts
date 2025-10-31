@@ -1,13 +1,13 @@
 import { IsUUID } from 'class-validator';
 import { BoxDto } from './models';
+import { ApiProperty } from '@nestjs/swagger';
 
-export namespace GetOneBoxDto {
-  export class Params {
-    @IsUUID()
-    id: string;
-  }
-
-  export type Response = Promise<{
-    data: BoxDto | null;
-  }>;
+export class GetOneBoxParamsDto {
+  @ApiProperty({ format: 'uuid' })
+  @IsUUID()
+  id: string;
 }
+
+export type GetOneBoxResponse = Promise<{
+  data: BoxDto | null;
+}>;

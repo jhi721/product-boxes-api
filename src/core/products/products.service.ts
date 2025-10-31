@@ -1,12 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ProductsRepository } from './products.repository';
-import { CreateProductDto, GetManyProductsDto, UpdateProductDto } from './dto';
+import {
+  CreateProductBodyDto,
+  GetManyProductsQueryDto,
+  UpdateProductBodyDto,
+} from './dto';
 
 @Injectable()
 export class ProductsService {
   constructor(private readonly _productRepository: ProductsRepository) {}
 
-  public async create(data: CreateProductDto.Body) {
+  public async create(data: CreateProductBodyDto) {
     const product = await this._productRepository.create(data);
 
     return { data: product };
@@ -18,7 +22,7 @@ export class ProductsService {
     sortBy,
     offset,
     direction,
-  }: GetManyProductsDto.Query) {
+  }: GetManyProductsQueryDto) {
     const order: Record<string, typeof direction> = {};
 
     if (sortBy) {
@@ -44,7 +48,7 @@ export class ProductsService {
     };
   }
 
-  public async updateOne(id: string, data: UpdateProductDto.Body) {
+  public async updateOne(id: string, data: UpdateProductBodyDto) {
     const product = await this._productRepository.updateOne({
       id,
       data,

@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Box } from '../../boxes/entities';
+import { Box } from '@core/boxes/entities';
 
 @Entity()
 export class Product {

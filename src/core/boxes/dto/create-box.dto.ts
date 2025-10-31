@@ -6,21 +6,27 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { BoxDto } from './models';
-import { CreateProductDto } from '../../products/dto';
 import { Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
+import { CreateProductBodyDto } from '@core/products/dto';
 
-export namespace CreateBoxDto {
-  export class Body implements Pick<BoxDto, 'label'> {
-    @IsString()
-    @Matches(/^[A-Z0-9-_]{3,32}$/)
-    @Length(3, 32)
-    label: string;
+export class CreateBoxBodyDto implements Pick<BoxDto, 'label'> {
+  @ApiProperty({
+    pattern: '^[A-Z0-9-_]{3,32}$',
+    minLength: 3,
+    maxLength: 32,
+    example: 'BOX-ABC_123',
+  })
+  @IsString()
+  @Matches(/^[A-Z0-9-_]{3,32}$/)
+  @Length(3, 32)
+  label: string;
 
-    @IsArray()
-    @ValidateNested({ each: true })
-    @Type(() => CreateProductDto.Body)
-    products: CreateProductDto.Body[];
-  }
-
-  export type Response = Promise<{ data: BoxDto }>;
+  @ApiProperty({ type: () => [CreateProductBodyDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateProductBodyDto)
+  products: CreateProductBodyDto[];
 }
+
+export type CreateBoxResponse = Promise<{ data: BoxDto }>;

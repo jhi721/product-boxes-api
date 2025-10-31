@@ -4,7 +4,7 @@ import { Product } from './entities';
 import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
 import { IProductRepository } from './types';
 import { FindOptionsOrderValue } from 'typeorm/find-options/FindOptionsOrder';
-import { Box, BoxStatus } from '../boxes/entities';
+import { Box, BoxStatus } from '@core/boxes/entities';
 
 @Injectable()
 export class ProductsRepository {
