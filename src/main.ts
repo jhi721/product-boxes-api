@@ -1,7 +1,8 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './core/app/app.module';
+import { AppModule } from '@core/app/app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { TypeOrmExceptionFilter } from '@common/filters';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -21,6 +22,8 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
+
+  app.useGlobalFilters(new TypeOrmExceptionFilter());
 
   await app.listen(process.env.PORT ?? 3000);
 }
